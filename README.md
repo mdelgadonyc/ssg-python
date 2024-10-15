@@ -72,6 +72,7 @@ description: "This is the first post on my blog."
 # Welcome!
 
 This is the first post on my new blog, generated using this awesome Static Site Generator.
+```
 
 ## Contributing
 
