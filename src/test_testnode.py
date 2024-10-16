@@ -9,7 +9,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_not_eq(self):
         node = TextNode("This is a text node", TextType.BOLD)
-        node2 = TextNode("This is a text node", TextType.HTML)
+        node2 = TextNode("This is a text node", TextType.ITALIC)
         self.assertNotEqual(node, node2)
 
     def test_eq_with_url(self):
