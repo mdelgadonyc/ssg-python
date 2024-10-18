@@ -18,7 +18,7 @@ class TestMarkdownParser(unittest.TestCase):
     def test_split_nodes_delimiter_bold(self):
         old_node = TextNode("This is text with a **bold** word", TextType.TEXT)
         new_nodes = split_nodes_delimiter([old_node], "**", TextType.BOLD)
-
+        
         new_nodes2 = [
             TextNode("This is text with a ", TextType.TEXT),
             TextNode("bold", TextType.BOLD),
@@ -89,7 +89,27 @@ class TestMarkdownParser(unittest.TestCase):
             TextNode(" and ", TextType.TEXT),
             TextNode("obi wan", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg") ]
         new_nodes = split_nodes_image(node)
-        self.assertEqual(new_nodes, expected_node)        
+        self.assertEqual(new_nodes, expected_node)
+
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        text_nodes = text_to_textnodes(text)
+
+        expected_node = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+
+        self.assertEqual(text_nodes, expected_node)
+
             
 if __name__ == "__main__":
     unittest.main()
