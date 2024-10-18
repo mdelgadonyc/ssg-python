@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode, TextType
-from markdown_parser import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from markdown_parser import *
 
 
 class TestMarkdownParser(unittest.TestCase):
@@ -63,6 +63,19 @@ class TestMarkdownParser(unittest.TestCase):
         expected_links = [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
         self.assertEqual(extracted_links, expected_links)
 
-
+    def test_split_nodes_links(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)", 
+            TextType.TEXT
+            )
+        
+        expected_node = [
+            TextNode("This is text with a link ", TextType.TEXT),
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev") ]
+        new_nodes = split_nodes_links(node)
+        self.assertEqual(new_nodes, expected_node)
+            
 if __name__ == "__main__":
     unittest.main()
