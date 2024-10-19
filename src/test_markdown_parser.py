@@ -74,7 +74,7 @@ class TestMarkdownParser(unittest.TestCase):
             TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
             TextNode(" and ", TextType.TEXT),
             TextNode("to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev") ]
-        new_nodes = split_nodes_link(node)
+        new_nodes = split_nodes(node, TextType.LINK)
         self.assertEqual(new_nodes, expected_node)
 
     def test_split_nodes_image(self):
@@ -88,7 +88,7 @@ class TestMarkdownParser(unittest.TestCase):
             TextNode("rick roll", TextType.IMAGE, "https://i.imgur.com/aKaOqIh.gif"),
             TextNode(" and ", TextType.TEXT),
             TextNode("obi wan", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg") ]
-        new_nodes = split_nodes_image(node)
+        new_nodes = split_nodes(node, TextType.IMAGE)
         self.assertEqual(new_nodes, expected_node)
 
     def test_text_to_textnodes(self):

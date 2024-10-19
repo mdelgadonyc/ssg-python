@@ -13,14 +13,13 @@ def text_to_textnodes(text):
     
     if "`" in text:
         node = split_nodes_delimiter(node, "`", TextType.CODE)
-    
+
     if "![" in text:
-        node = split_nodes_image(node)
+        node = split_nodes(node, TextType.IMAGE)
     
     if "[" in text:
-        node = split_nodes_link(node)
+        node = split_nodes(node, TextType.LINK)
 
-    #node.pop()
     return node
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -44,53 +43,35 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             new_nodes.append(node)
                 
     return new_nodes
-        
-def split_nodes_link(old_nodes) -> list[TextNode]:
+
+def split_nodes(old_nodes, text_type) -> list[TextNode]:
     new_nodes = []
 
     if isinstance(old_nodes, TextNode):
         old_nodes = [old_nodes]
 
     for node in old_nodes:
-        if "[" in node.text:
-            links = extract_markdown_links(node.text)    
+        if "[" in node.text and text_type == TextType.LINK:
+            result = extract_markdown_links(node.text)    
             text_segments = re.split(r"(?<!!)\[(?:[^\[\]]*)\]\((?:[^()]*)\)", node.text)
-
-            for segment in text_segments:
-                if segment:
-                    new_nodes.append(TextNode(segment, TextType.TEXT))
-                if links:
-                    text, url = links.pop(0)
-                    new_nodes.append(TextNode(text, TextType.LINK, url))
-        else:
-            new_nodes.append(node)
-
-    return new_nodes
-
-def split_nodes_image(old_nodes) -> list[TextNode]:
-    new_nodes = []
-
-    if isinstance(old_nodes, TextNode):
-        old_nodes = [old_nodes]
-
-    for node in old_nodes:
-        if "![" in node.text:
-            images = extract_markdown_images(node.text)    
+        elif "![" in node.text and text_type == TextType.IMAGE:
+            result = extract_markdown_images(node.text)
             text_segments = re.split(r"!\[(?:[^\[\]]*)\]\((?:[^()]*)\)", node.text)
+        else:
+            text_segments = None
+            result = None
+            new_nodes.append(node)
 
+        if text_segments:
             for segment in text_segments:
                 if segment:
                     new_nodes.append(TextNode(segment, TextType.TEXT))
-                if images:
-                    text, url = images.pop(0)
-                    new_nodes.append(TextNode(text, TextType.IMAGE, url))
-
-        else:
-            new_nodes.append(node)
+                if result:
+                    text, url = result.pop(0)
+                    new_nodes.append(TextNode(text, text_type, url))
 
     return new_nodes
-
-
+  
 def extract_markdown_images(text):
     return re.findall("!\[([^\[\]]*)\]\(([^()]*)\)", text)
     
