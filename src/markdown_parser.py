@@ -8,10 +8,10 @@ def text_to_textnodes(text):
     if "**" in text:
         node = split_nodes_delimiter(node, "**", TextType.BOLD)
     
-    if "*" in text:
+    if "*" in text and text[0] != "*":
         node = split_nodes_delimiter(node, "*", TextType.ITALIC)
     
-    if "`" in text:
+    if "`" in text and text[0] != "`":
         node = split_nodes_delimiter(node, "`", TextType.CODE)
 
     if "![" in text:
@@ -24,7 +24,7 @@ def text_to_textnodes(text):
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
-
+    
     for node in old_nodes:
         if delimiter in node.text:
             node.text_type = text_type
