@@ -23,7 +23,7 @@ def heading_check(markdown_text):
     return False
 
 def codeblock_check(markdown_text):
-    if re.fullmatch(r"^```.*```$", markdown_text):
+    if re.fullmatch(r"^```.*```$", markdown_text, re.DOTALL):
         return "codeblock"
     return False
 
