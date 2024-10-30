@@ -2,7 +2,7 @@ class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None) -> None:
         self.tag = tag
         self.value = value
-        self.children = children
+        self.children = children if isinstance(children, list) else [children] if children else []
         self.props = props
 
     def to_html(self):
@@ -18,10 +18,15 @@ class HTMLNode():
 
         return props_result
 
-    def __eq__(self, value: object) -> bool:
-        if self.tag == value.tag and self.value == value.value and self.children == value.children and self.props == value.props:
-            return True
-        return False    
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, HTMLNode):
+            return False
+        return (
+            self.tag == other.tag and
+            self.value == other.value and
+            self.props == other.props and
+            self.children == other.children
+        )
     
     def __repr__(self) -> str:
         return f"HTMLNode(tag={self.tag}, value={self.value}, children={self.children}, props={self.props})"
