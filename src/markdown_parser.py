@@ -2,7 +2,6 @@ from textnode import TextNode, TextType
 import re
 
 def text_to_textnodes(text):
-
     nodes = [TextNode(text, TextType.TEXT)]
 
     if "**" in text:
@@ -93,7 +92,7 @@ def markdown_to_blocks(markdown):
     for block in markdown_blocks:
         new_block = []
         for line in block.split("\n"):
-            new_block.append(line.strip())
+            new_block.append(line)
         new_markdown_blocks.append("\n".join(new_block))
 
     return new_markdown_blocks
