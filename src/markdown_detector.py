@@ -1,19 +1,21 @@
 import re
 
 def block_to_block_type(markdown_text):
-    match markdown_text[0]:
-        case '#':
-            return heading_check(markdown_text)
-        case '`':
-            return codeblock_check(markdown_text)
-        case '>':
-            return quoteblock_check(markdown_text)
-        case '*' | '-':
-            return unordered_list_check(markdown_text)
-        case char if markdown_text[0] == '1':
-            return ordered_list_check(markdown_text)
-        case _:
-            return "normal"
+    markdown_text = markdown_text.strip()
+    
+    if markdown_text.startswith("#"):
+        return heading_check(markdown_text)
+    elif markdown_text.startswith("```"):
+        return codeblock_check(markdown_text)
+    elif markdown_text.startswith("> "):
+        return quoteblock_check(markdown_text)
+    elif markdown_text.startswith("* ") or markdown_text.startswith("- "):
+        return unordered_list_check(markdown_text)
+    elif markdown_text.startswith("1. "):
+        return ordered_list_check(markdown_text)
+    else:
+        return "normal"
+
         
 def heading_check(markdown_text):
     markdown_text = markdown_text.split()
@@ -36,6 +38,7 @@ def quoteblock_check(markdown_text):
 def unordered_list_check(markdown_text):
     for line in markdown_text.split('\n'):
         if not bool (re.match(r"^(\* | - )", markdown_text)):
+            print("whyyyyy")
             return False
     return "unordered_list"
 
