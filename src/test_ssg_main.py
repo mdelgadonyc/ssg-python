@@ -39,9 +39,7 @@ class TestMarkdownToHtml(unittest.TestCase):
         self.assertEqual(block_result, block_expected)
         
      def test_markdown_to_html_node_unordered_list(self):
-        markdown = """* This is the first list item in a list block
-        * This is a list item
-        * This is another list item"""
+        markdown = "* This is the first list item in a list block\n* This is a list item\n* This is another list item"
         block_result = markdown_to_html_node(markdown)
 
         block_expected = [
@@ -59,9 +57,7 @@ class TestMarkdownToHtml(unittest.TestCase):
         self.assertEqual(block_result, block_expected)
 
      def test_markdown_to_html_node_unordered_list_with_italic(self):
-        markdown = """* This is the first list item in a list block
-        * This is a list item with *italic* text
-        * This is another list item"""
+        markdown = "* This is the first list item in a list block\n* This is a list item with *italic* text\n* This is another list item"
         block_actual = markdown_to_html_node(markdown)
 
         block_expected = [
@@ -84,9 +80,7 @@ class TestMarkdownToHtml(unittest.TestCase):
         self.assertEqual(block_actual, block_expected)
 
      def test_markdown_to_html_node_ordered_list(self):
-        markdown = """1. This is the first list item in a list block
-        2. This is the second item
-        3. This is the third list item"""
+        markdown = "1. This is the first list item in a list block\n2. This is the second item\n3. This is the third list item"
         block_result = markdown_to_html_node(markdown)
 
         block_expected = [
@@ -131,22 +125,18 @@ class TestMarkdownToHtml(unittest.TestCase):
          self.assertEqual(block_result, block_expected)
 
      def test_markdown_to_html_node_codeblock(self):
-         markdown = """```
-         def say_hello():
-          print("Hello world!")
-          ```"""
+         markdown = """```\ndef say_hello():\n\tprint("Hello world!")\n```"""
          block_result = markdown_to_html_node(markdown)
          block_expected = [
              HTMLNode(tag="pre", value=None, children=[
                  HTMLNode(tag="code", value=None, children=[
-                     HTMLNode(tag=None, value='def say_hello():\nprint("Hello world!")', children=None, props=None),
+                     HTMLNode(tag=None, value='def say_hello():\n\tprint("Hello world!")', children=None, props=None),
                  ], props=None),
              ], props=None)
           ]
          block_expected = HTMLNode(tag="div", children=block_expected)
          self.assertEqual(block_result, block_expected)
-
-    
+             
      def test_markdown_to_html_node_tolkien(self):
          markdown = """# Tolkien Fan Club
 
@@ -184,13 +174,7 @@ class TestMarkdownToHtml(unittest.TestCase):
          self.assertEqual(block_result, block_expected)
      
      def test_markdown_to_html_node_blocks(self):
-        markdown = """# This is a heading
-
-        This is a paragraph of text. It has some **bold** and *italic* words inside of it.
-
-        * This is the first list item in a list block
-        * This is a list item
-        * This is another list item"""
+        markdown = "# This is a heading\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item"
 
         header_block = [
              HTMLNode(tag="h1", value=None, children=[
