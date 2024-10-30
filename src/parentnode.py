@@ -7,9 +7,11 @@ class ParentNode(HTMLNode):
     def to_html(self):
         if self.tag == None:
             raise ValueError("Missing tag")
-        if self.children == None:
+        if self.children == []:
             raise ValueError("Missing children")
         html_string = f"<{self.tag}{self.props_to_html()}>"
+        if isinstance(self.children, HTMLNode):
+            self.children = [self.children]
         for child in self.children:
             html_string += child.to_html()
         html_string += f"</{self.tag}>"
