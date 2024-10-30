@@ -3,45 +3,54 @@ import re
 
 def text_to_textnodes(text):
 
-    node = [TextNode(text, TextType.TEXT)]
+    nodes = [TextNode(text, TextType.TEXT)]
 
     if "**" in text:
-        node = split_nodes_delimiter(node, "**", TextType.BOLD)
-    
-    if "*" in text and text[0] != "*":
-        node = split_nodes_delimiter(node, "*", TextType.ITALIC)
+        nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+
+    if "*" in text and text[0:2] != "* ":
+        nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
     
     if "`" in text and text[0] != "`":
-        node = split_nodes_delimiter(node, "`", TextType.CODE)
+        nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
 
     if "![" in text:
-        node = split_nodes(node, TextType.IMAGE)
+        nodes = split_nodes(nodes, TextType.IMAGE)
     
     if "[" in text:
-        node = split_nodes(node, TextType.LINK)
+        nodes = split_nodes(nodes, TextType.LINK)
 
-    return node
+    return nodes
+
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
-    
-    for node in old_nodes:
-        if delimiter in node.text:
-            node.text_type = text_type
-            segments = node.text.split(delimiter)
 
-            text_type_toggle = False
-
-            for segment in segments:
-                if text_type_toggle:
-                    new_nodes.append(TextNode(segment, text_type))
-                    text_type_toggle = False
-                else:
-                    new_nodes.append(TextNode(segment, TextType.TEXT))
-                    text_type_toggle = True
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+            continue
+        text = old_node.text
+        if text_type == TextType.BOLD:
+            pattern = r'\*\*(.*?)\*\*'
+        elif text_type == TextType.ITALIC:
+            pattern = r'\*(.*?)\*'
+        elif text_type == TextType.CODE:
+            pattern = r'`(.*?)`'
         else:
-            new_nodes.append(node)
-                
+            raise ValueError("Invalid text type")
+        
+        matches = re.findall(pattern, text)
+        for match in matches:
+            index = text.index(delimiter + match + delimiter)
+            pre_match_text = text[:index]
+            if pre_match_text:
+                new_nodes.append(TextNode(pre_match_text, TextType.TEXT))
+            new_nodes.append(TextNode(match, text_type))
+            text = text[index + len(delimiter + match + delimiter):]
+        
+        if text:
+            new_nodes.append(TextNode(text, TextType.TEXT))
     return new_nodes
 
 def split_nodes(old_nodes, text_type) -> list[TextNode]:
@@ -51,12 +60,12 @@ def split_nodes(old_nodes, text_type) -> list[TextNode]:
         old_nodes = [old_nodes]
 
     for node in old_nodes:
-        if "[" in node.text and text_type == TextType.LINK:
-            result = extract_markdown_links(node.text)    
-            text_segments = re.split(r"(?<!!)\[(?:[^\[\]]*)\]\((?:[^()]*)\)", node.text)
-        elif "![" in node.text and text_type == TextType.IMAGE:
+        if "![" in node.text and text_type == TextType.IMAGE:
             result = extract_markdown_images(node.text)
             text_segments = re.split(r"!\[(?:[^\[\]]*)\]\((?:[^()]*)\)", node.text)
+        elif "[" in node.text and text_type == TextType.LINK:
+            result = extract_markdown_links(node.text)
+            text_segments = re.split(r"(?<!!)\[(?:[^\[\]]*)\]\((?:[^()]*)\)", node.text)
         else:
             text_segments = None
             result = None
@@ -69,7 +78,6 @@ def split_nodes(old_nodes, text_type) -> list[TextNode]:
                 if result:
                     text, url = result.pop(0)
                     new_nodes.append(TextNode(text, text_type, url))
-
     return new_nodes
   
 def extract_markdown_images(text):
