@@ -2,6 +2,8 @@ import unittest
 from ssg_main import markdown_to_html_node
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode
+from parentnode import ParentNode
+from leafnode import LeafNode
 
 class TestMarkdownToHtml(unittest.TestCase):
      def test_markdown_to_html_node_paragraph(self):
@@ -55,6 +57,31 @@ class TestMarkdownToHtml(unittest.TestCase):
         ]
         block_expected = HTMLNode(tag="div", children=block_expected)
         self.assertEqual(block_result, block_expected)
+
+     def test_markdown_to_html_node_unordered_list_with_italic(self):
+        markdown = """* This is the first list item in a list block
+        * This is a list item with *italic* text
+        * This is another list item"""
+        block_actual = markdown_to_html_node(markdown)
+
+        block_expected = [
+             ParentNode(tag="ul", value=None, children=[
+                        ParentNode(tag="li", value=None, children=[
+                                 LeafNode(tag=None, value="This is the first list item in a list block", props=None)
+                                 ], props=None),
+                        ParentNode(tag="li", value=None, children=[
+                                 LeafNode(tag=None, value="This is a list item with ", props=None),
+                                 ParentNode(tag="em", value=None, children=
+                                     LeafNode(tag=None, value="italic", props=None)
+                                 , props=None),
+                                 LeafNode(tag=None, value=" text", props=None),
+                        ], props=None),
+                        ParentNode(tag="li", value=None, children=[
+                                 LeafNode(tag=None, value="This is another list item", props=None)], props=None),
+                        ], props=None)
+        ]
+        block_expected = ParentNode(tag="div", children=block_expected)
+        self.assertEqual(block_actual, block_expected)
 
      def test_markdown_to_html_node_ordered_list(self):
         markdown = """1. This is the first list item in a list block
@@ -116,6 +143,43 @@ class TestMarkdownToHtml(unittest.TestCase):
                  ], props=None),
              ], props=None)
           ]
+         block_expected = HTMLNode(tag="div", children=block_expected)
+         self.assertEqual(block_result, block_expected)
+
+    
+     def test_markdown_to_html_node_tolkien(self):
+         markdown = """# Tolkien Fan Club
+
+**I like Tolkien**. Read my [first post here](/majesty) (sorry the link doesn't work yet)
+
+> All that is gold does not glitter"""
+
+         block_result = markdown_to_html_node(markdown)
+         
+         header_block = [
+             HTMLNode(tag="h1", value=None, children=[
+                        HTMLNode(tag=None, value="Tolkien Fan Club", children=None, props=None),
+             ], props=None)
+        ]
+
+         paragraph_block = [
+            HTMLNode(tag="p", value=None, children=[
+                HTMLNode(tag="strong", value=None, children=
+                         HTMLNode(tag=None, value="I like Tolkien", children=None, props=None), props=None),
+                    HTMLNode(tag=None, value=". Read my ", children=None, props=None),
+                    HTMLNode(tag="a", value=None, children=[
+                        HTMLNode(tag=None, value="first post here", children=None, props=None)], props={'href': '/majesty'}),
+                    HTMLNode(tag=None, value=" (sorry the link doesn't work yet)", props=None, children=None)
+            ], props=None)
+        ]
+         
+         quote_block = [
+             HTMLNode(tag="blockquote", value=None, children=[
+                 HTMLNode(tag=None, value="All that is gold does not glitter", children=None, props=None)
+             ], props=None)     
+         ]
+        
+         block_expected = [*header_block, *paragraph_block, *quote_block]
          block_expected = HTMLNode(tag="div", children=block_expected)
          self.assertEqual(block_result, block_expected)
      
