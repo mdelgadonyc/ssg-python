@@ -5,8 +5,8 @@ from markdown_parser import *
 
 class TestMarkdownParser(unittest.TestCase):
     def test_split_nodes_delimiter_code(self):
-        old_node = TextNode("This is text with a `code block` word", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([old_node], "`", TextType.CODE)
+        old_node = [TextNode("This is text with a `code block` word", TextType.TEXT)]
+        new_nodes = split_nodes_delimiter(old_node, "`", TextType.CODE)
 
         new_nodes2 = [
             TextNode("This is text with a ", TextType.TEXT),
@@ -16,26 +16,38 @@ class TestMarkdownParser(unittest.TestCase):
         self.assertEqual(new_nodes, new_nodes2)        
 
     def test_split_nodes_delimiter_bold(self):
-        old_node = TextNode("This is text with a **bold** word", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([old_node], "**", TextType.BOLD)
+        old_node = [TextNode("This is text with a **bold** word", TextType.TEXT)]
+        actual_result = split_nodes_delimiter(old_node, "**", TextType.BOLD)
         
         new_nodes2 = [
             TextNode("This is text with a ", TextType.TEXT),
             TextNode("bold", TextType.BOLD),
             TextNode(" word", TextType.TEXT)
         ]
-        self.assertEqual(new_nodes, new_nodes2)    
+        self.assertEqual(actual_result, new_nodes2)
+
+    def test_split_nodes_delimiter_bold_start_of_text(self):
+        old_node = [TextNode("**bold** word with this **bold text**.", TextType.TEXT)]
+        actual_result = split_nodes_delimiter(old_node, "**", TextType.BOLD)
+        
+        expected_result = [
+            TextNode("bold", TextType.BOLD),
+            TextNode(" word with this ", TextType.TEXT),
+            TextNode("bold text", TextType.BOLD),
+            TextNode(".", TextType.TEXT)
+        ]
+        self.assertEqual(actual_result, expected_result)   
         
     def test_split_nodes_delimiter_italic(self):
-        old_node = TextNode("This is text with an *italic* word", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([old_node], "*", TextType.ITALIC)
+        old_node = [TextNode("This is text with an *italic* word", TextType.TEXT)]
+        actual_result = split_nodes_delimiter(old_node, "*", TextType.ITALIC)
 
         new_nodes2 = [
             TextNode("This is text with an ", TextType.TEXT),
             TextNode("italic", TextType.ITALIC),
             TextNode(" word", TextType.TEXT)
         ]
-        self.assertEqual(new_nodes, new_nodes2)
+        self.assertEqual(actual_result, new_nodes2)
 
     def test_extract_markdown_images(self):
         text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
@@ -93,7 +105,7 @@ class TestMarkdownParser(unittest.TestCase):
 
     def test_text_to_textnodes(self):
         text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-        text_nodes = text_to_textnodes(text)
+        actual_result = text_to_textnodes(text)
 
         expected_node = [
             TextNode("This is ", TextType.TEXT),
@@ -107,8 +119,7 @@ class TestMarkdownParser(unittest.TestCase):
             TextNode(" and a ", TextType.TEXT),
             TextNode("link", TextType.LINK, "https://boot.dev"),
         ]
-
-        self.assertEqual(text_nodes, expected_node)
+        self.assertEqual(actual_result, expected_node)
 
     def test_markdown_to_blocks(self):
         markdown = """# This is a heading
