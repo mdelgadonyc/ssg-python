@@ -12,6 +12,8 @@ def markdown_to_html_node(markdown):
 
     for index, block in enumerate(blocks):
         textnode_list = text_to_textnodes(block)
+        print(f"textnode_list: {textnode_list}")
+
         # determine block type
         if textnode_list[0].text == "" and textnode_list[0].text_type == TextType.TEXT:
             continue
@@ -40,11 +42,12 @@ def text_to_children(text, block_type, url=None):
         return normaltext_helper(text)
     elif block_type == TextType.BOLD:
         child_node = text_to_children(text, TextType.TEXT)
-        return ParentNode(tag="strong", value=text, children=child_node)
+        return ParentNode(tag="b", value=text, children=child_node)
     elif block_type == TextType.ITALIC:
         child_node = text_to_children(text, TextType.TEXT)
-        return ParentNode(tag="em", value=text, children=child_node)
+        return ParentNode(tag="i", value=text, children=child_node)
     elif block_type == "unordered_list":
+        print(f"ul text: {text}")
         return unordered_helper(text)
     elif block_type == "ordered_list":
         return ordered_helper(text)
@@ -56,8 +59,11 @@ def text_to_children(text, block_type, url=None):
         return codeblock_helper(text)
     elif block_type == TextType.LINK:
         return link_helper(text, url)
+    elif block_type == TextType.IMAGE:
+        return image_helper(text, url)
     else:
         print(f"hit the end of text_to_children. block_type: {block_type}")
+        print(f"text: {text}")
 
 def header_helper(text):
     tag = f"h{text.count('#')}"
@@ -87,7 +93,12 @@ def link_helper(text, url):
     child_node = [text_to_children(text, TextType.TEXT)]
     return ParentNode(tag="a", value=None, children=child_node, props={"href": url})
 
+def image_helper(text, url):
+    child_node = [text_to_children(text, TextType.TEXT)]
+    return ParentNode(tag="img", value=None, children=child_node, props={"src": url, "alt": text})
+
 def unordered_helper(text):
+    print(f"unordered_helper text: {text}")
     children = create_list_items(text)
     return(ParentNode(tag="ul", children=children))
 
