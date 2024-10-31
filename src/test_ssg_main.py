@@ -13,11 +13,11 @@ class TestMarkdownToHtml(unittest.TestCase):
           block_expected = [
                HTMLNode(tag="p", value=None, children=[
                          HTMLNode(tag=None, value="This is a paragraph of text. It has some ", children=None, props=None), 
-                         HTMLNode(tag="strong", value=None, children=
+                         HTMLNode(tag="b", value=None, children=
                                    HTMLNode(tag=None, value="bold", children=None, props=None), 
                                    props=None), 
                          HTMLNode(tag=None, value=" and ", children=None, props=None), 
-                         HTMLNode(tag="em", value=None, children=
+                         HTMLNode(tag="i", value=None, children=
                                    HTMLNode(tag=None, value="italic", children=None, props=None), 
                                    props=None), 
                          HTMLNode(tag=None, value=" words inside of it.", children=None, props=None)
@@ -67,7 +67,7 @@ class TestMarkdownToHtml(unittest.TestCase):
                                  ], props=None),
                         ParentNode(tag="li", value=None, children=[
                                  LeafNode(tag=None, value="This is a list item with ", props=None),
-                                 ParentNode(tag="em", value=None, children=
+                                 ParentNode(tag="i", value=None, children=
                                      LeafNode(tag=None, value="italic", props=None)
                                  , props=None),
                                  LeafNode(tag=None, value=" text", props=None),
@@ -154,7 +154,7 @@ class TestMarkdownToHtml(unittest.TestCase):
 
          paragraph_block = [
             HTMLNode(tag="p", value=None, children=[
-                HTMLNode(tag="strong", value=None, children=
+                HTMLNode(tag="b", value=None, children=
                          HTMLNode(tag=None, value="I like Tolkien", children=None, props=None), props=None),
                     HTMLNode(tag=None, value=". Read my ", children=None, props=None),
                     HTMLNode(tag="a", value=None, children=[
@@ -185,11 +185,11 @@ class TestMarkdownToHtml(unittest.TestCase):
         paragraph_block = [
              HTMLNode(tag="p", value=None, children=[
                         HTMLNode(tag=None, value="This is a paragraph of text. It has some ", children=None, props=None), 
-                        HTMLNode(tag="strong", value=None, children=
+                        HTMLNode(tag="b", value=None, children=
                                 HTMLNode(tag=None, value="bold", children=None, props=None), 
                                 props=None), 
                         HTMLNode(tag=None, value=" and ", children=None, props=None), 
-                        HTMLNode(tag="em", value=None, children=
+                        HTMLNode(tag="i", value=None, children=
                                 HTMLNode(tag=None, value="italic", children=None, props=None), 
                                 props=None), 
                         HTMLNode(tag=None, value=" words inside of it.", children=None, props=None)
@@ -217,6 +217,15 @@ class TestMarkdownToHtml(unittest.TestCase):
         blocks_expected = HTMLNode(tag="div", children=blocks, props=None)
         blocks_result = markdown_to_html_node(markdown)
         self.assertEqual(blocks_result, blocks_expected)
+
+     def test_markdown_to_html_node_final(self):
+        with open("../content/majesty/index.md", "r") as file:
+            markdown = file.read()
+            
+        block_result = markdown_to_html_node(markdown)
+        #print(block_result)
+        print(block_result.to_html())
+
 
 if __name__ == "__main__":
     unittest.main()
