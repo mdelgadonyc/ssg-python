@@ -47,7 +47,6 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 new_nodes.append(TextNode(pre_match_text, TextType.TEXT))
             new_nodes.append(TextNode(match, text_type))
             text = text[index + len(delimiter + match + delimiter):]
-        
         if text:
             new_nodes.append(TextNode(text, TextType.TEXT))
     return new_nodes
@@ -86,13 +85,5 @@ def extract_markdown_links(text):
     return re.findall("(?<!!)\[([^\[\]]*)\]\(([^()]*)\)", text)
 
 def markdown_to_blocks(markdown):
-    markdown_blocks = markdown.split("\n\n")
-
-    new_markdown_blocks = []
-    for block in markdown_blocks:
-        new_block = []
-        for line in block.split("\n"):
-            new_block.append(line)
-        new_markdown_blocks.append("\n".join(new_block))
-
-    return new_markdown_blocks
+    markdown = markdown.rstrip()
+    return markdown.split("\n\n")
