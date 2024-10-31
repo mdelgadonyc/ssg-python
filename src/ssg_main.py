@@ -6,7 +6,6 @@ from textnode import TextNode, TextType
 import re
 
 def markdown_to_html_node(markdown):
-    markdown = markdown.rstrip()
     blocks = markdown_to_blocks(markdown)
     children = []
 
