@@ -16,7 +16,6 @@ def block_to_block_type(markdown_text):
     else:
         return "normal"
 
-        
 def heading_check(markdown_text):
     markdown_text = markdown_text.split()
     first_segment = markdown_text[0]
@@ -36,14 +35,7 @@ def quoteblock_check(markdown_text):
     return "quoteblock"
 
 def unordered_list_check(markdown_text):
-    for line in markdown_text.split('\n'):
-        if not bool (re.match(r"^(\* | - )", markdown_text)):
-            print("whyyyyy")
-            return False
     return "unordered_list"
 
 def ordered_list_check(markdown_text):
-    for index, line in enumerate(markdown_text.split('\n'), start=1):
-        if line[0:3] != f"{index}. ":
-            return False
     return "ordered_list"
