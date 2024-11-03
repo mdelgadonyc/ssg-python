@@ -10,10 +10,12 @@ class ParentNode(HTMLNode):
         if self.children == []:
             raise ValueError("Missing children")
         html_string = f"<{self.tag}{self.props_to_html()}>"
-        if isinstance(self.children, HTMLNode):
-            self.children = [self.children]
         for child in self.children:
-            html_string += child.to_html()
+            if isinstance(child, list):
+                for item in child:
+                    html_string += item.to_html()
+            else:
+                html_string += child.to_html()
         html_string += f"</{self.tag}>"
         return html_string
     
