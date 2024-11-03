@@ -13,11 +13,12 @@ def main():
 
     dir_path_content = "content"
 
-    if os.path.exists(destination_dir) and os.path.exists(source_dir):
-        print("Deleting and recreating public directory...")
+    print("Deleting and recreating public directory...")
+    if os.path.exists(destination_dir):
         shutil.rmtree(destination_dir)
-        os.mkdir(destination_dir)
+    os.mkdir(destination_dir)
 
+    if os.path.exists(source_dir):
         copy_files(source_dir, destination_dir)
     
     generate_pages_recursive(dir_path_content=dir_path_content, template_path=template_path, dest_dir_path=destination_dir)
