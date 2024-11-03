@@ -23,8 +23,7 @@ class TextNode():
         return False
     
     def __repr__(self) -> str:
-        #return TextNode(self.text, self.text_type, self.url)
-        return  f"TextNode({self.text}, {self.text_type}, {self.url})"
+        return  f'TextNode("{self.text}", {self.text_type}, {self.url})'
 
 
 def text_node_to_html(text_node):
