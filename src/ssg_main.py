@@ -9,71 +9,72 @@ def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     children = []
 
-    for index, block in enumerate(blocks):
-        textnode_list = text_to_textnodes(block)
-        print(f"textnode_list: {textnode_list}")
-
-        # determine block type
-        if textnode_list[0].text == "" and textnode_list[0].text_type == TextType.TEXT:
-            continue
-        if block_to_block_type(textnode_list[0].text) == "normal":
-            paragraph_node = ParentNode(tag="p", value="", children=[])
-            for textnode in textnode_list:
-                if textnode.url:
-                    node = text_to_children(textnode.text, textnode.text_type, textnode.url)
-                else:
-                    node = text_to_children(textnode.text, textnode.text_type)
-                paragraph_node.children.append(node)
-            children.append(paragraph_node)
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        
+        if block_type == "normal":
+            children.append(normalblock_helper(block))
+        elif block_type == "heading":
+            children.append(header_helper(block))
+        elif block_type == "quoteblock":
+            children.append(blockquote_helper(block))
+        elif block_type == "codeblock":
+            children.append(codeblock_helper(block))
+        elif block_type == "unordered_list":
+            children.append(unordered_helper(block))
+        elif block_type == "ordered_list":
+            children.append(ordered_helper(block))
         else:
-            for textnode in textnode_list:
-                if textnode.text_type == TextType.TEXT:
-                    text_type = block_to_block_type(textnode.text)
-                    if text_type == "normal":
-                        text_type = TextType.TEXT
-                    children.append(text_to_children(textnode.text, text_type))
+            print(f"second hit of block_type: {block_type}\n\n")
+            continue
     return ParentNode(tag="div", children=children)
 
 def text_to_children(text, block_type, url=None):
-    if block_type == "heading":
-        return header_helper(text)
-    elif block_type == TextType.TEXT:
-        return normaltext_helper(text)
-    elif block_type == TextType.BOLD:
+    if block_type == TextType.TEXT:
+        return LeafNode(tag=None, value=text, props=None)
+    if block_type == TextType.BOLD:
         child_node = text_to_children(text, TextType.TEXT)
         return ParentNode(tag="b", value=text, children=child_node)
     elif block_type == TextType.ITALIC:
         child_node = text_to_children(text, TextType.TEXT)
         return ParentNode(tag="i", value=text, children=child_node)
-    elif block_type == "unordered_list":
-        print(f"ul text: {text}")
-        return unordered_helper(text)
-    elif block_type == "ordered_list":
-        return ordered_helper(text)
     elif block_type == TextType.CODE:
         return code_helper(text)
-    elif block_type == "quoteblock":
-        return blockquote_helper(text)
-    elif block_type == "codeblock":
-        return codeblock_helper(text)
     elif block_type == TextType.LINK:
         return link_helper(text, url)
     elif block_type == TextType.IMAGE:
         return image_helper(text, url)
+
     else:
         print(f"hit the end of text_to_children. block_type: {block_type}")
         print(f"text: {text}")
 
-def header_helper(text):
+def normalblock_helper(block):
+    textnode_list = text_to_textnodes(block)
+
+    paragraph_node = ParentNode(tag="p", value="", children=[])
+    for textnode in textnode_list:
+        node = text_to_children(textnode.text, textnode.text_type, textnode.url)
+        paragraph_node.children.append(node)
+    return paragraph_node
+
+def header_helper(block):
+    textnode_list = text_to_textnodes(block)
+    text = textnode_list[0].text
     tag = f"h{text.count('#')}"
-    text = text.replace("#", "").strip()
+    text = text.replace("#", "").lstrip()
+    text2 = text.lstrip()
     child_node = [text_to_children(text, TextType.TEXT)]
+    for textnode in textnode_list[1:]:
+        child_node.append([text_to_children(textnode.text, textnode.text_type)])
     return ParentNode(tag=tag, children=child_node)
 
 def normaltext_helper(text):
     return(LeafNode(tag=None, value=text, props=None))
 
-def blockquote_helper(text):
+def blockquote_helper(block):
+    textnode_list = text_to_textnodes(block)
+    text = textnode_list[0].text
     text = text.replace(">", "").strip()
     child_node = [text_to_children(text, TextType.TEXT)]
     return ParentNode(tag="blockquote", children=child_node)
@@ -93,25 +94,47 @@ def link_helper(text, url):
     return ParentNode(tag="a", value=None, children=child_node, props={"href": url})
 
 def image_helper(text, url):
-    child_node = [text_to_children(text, TextType.TEXT)]
-    return ParentNode(tag="img", value=None, children=child_node, props={"src": url, "alt": text})
+    return LeafNode(tag="img", value=None, props={"src": url, "alt": text})
 
-def unordered_helper(text):
-    print(f"unordered_helper text: {text}")
-    children = create_list_items(text)
+def unordered_helper(block):
+    pattern = r'^[*-] (.+?)(?:\n|$)'
+    items = re.split(pattern, block, flags=re.MULTILINE)
+    items = [item for item in items if item.strip()]
+
+    children = []
+    for item in items:
+        text_nodes = text_to_textnodes(item)
+        child = []
+        for text_node in text_nodes:
+            child.append(text_to_children(text_node.text, text_node.text_type))
+        children.append(ParentNode(tag="li", children=child, props=None))
     return(ParentNode(tag="ul", children=children))
 
-def ordered_helper(text):
-    children = create_list_items(text)
-    return(ParentNode(tag="ol", children=children))
+def ordered_helper(block):
+    pattern = r'(?=\d+\.\s)'
+    items = re.split(pattern, block, flags=re.MULTILINE)
+    items = [item.strip() for item in items if item.strip()]
 
-def create_list_items(text):
+    children = []
+    for item in items:
+        item = item[3:] # remove preceeding list item number
+        text_nodes = text_to_textnodes(item)
+        child = []
+        for text_node in text_nodes:
+            child.append(text_to_children(text_node.text, text_node.text_type))
+        children.append(ParentNode(tag="li", children=child, props=None))
+
+    return(ParentNode(tag="ol", children=children))
+    
+
+def create_list_items(textnode_list):
     # choose regex pattern based on whether list items belong to unordered "*" or ordered list
-    if text[0] == "*":
-        items_pattern = r'^\* (.+)'
-    else:
+    if textnode_list[0].startswith("1. "):
         items_pattern = r'^\d+\. (.+)'
-    items = re.findall(items_pattern, text, re.MULTILINE)
+    else:
+        items_pattern = r'^[*-] (.+)'
+    
+    items = re.findall(items_pattern, textnode_list, re.MULTILINE)
 
     children = []
     item_nodes = []
