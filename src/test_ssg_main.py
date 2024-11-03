@@ -218,14 +218,5 @@ class TestMarkdownToHtml(unittest.TestCase):
         blocks_result = markdown_to_html_node(markdown)
         self.assertEqual(blocks_result, blocks_expected)
 
-     def test_markdown_to_html_node_final(self):
-        with open("../content/majesty/index.md", "r") as file:
-            markdown = file.read()
-            
-        block_result = markdown_to_html_node(markdown)
-        #print(block_result)
-        print(block_result.to_html())
-
-
 if __name__ == "__main__":
     unittest.main()
