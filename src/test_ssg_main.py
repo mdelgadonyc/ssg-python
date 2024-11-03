@@ -84,17 +84,17 @@ class TestMarkdownToHtml(unittest.TestCase):
         block_result = markdown_to_html_node(markdown)
 
         block_expected = [
-             HTMLNode(tag="ol", value=None, children=[
-                        HTMLNode(tag="li", value=None, children=
-                                 HTMLNode(tag=None, value="This is the first list item in a list block", children=None, props=None), props=None),
-                        HTMLNode(tag="li", value=None, children=
-                                 HTMLNode(tag=None, value="This is the second item", children=None, props=None), props=None),
-                        HTMLNode(tag="li", value=None, children=
-                                 HTMLNode(tag=None, value="This is the third list item", children=None, props=None), props=None),
+             ParentNode(tag="ol", value=None, children=[
+                        ParentNode(tag="li", value=None, children=
+                                 LeafNode(tag=None, value="This is the first list item in a list block", props=None), props=None),
+                        ParentNode(tag="li", value=None, children=
+                                 LeafNode(tag=None, value="This is the second item", props=None), props=None),
+                        ParentNode(tag="li", value=None, children=
+                                 LeafNode(tag=None, value="This is the third list item", props=None), props=None),
                         
              ], props=None)
         ]
-        block_expected = HTMLNode(tag="div", children=block_expected)
+        block_expected = ParentNode(tag="div", children=block_expected)
         self.assertEqual(block_result, block_expected)
 
      def test_markdown_to_html_node_quoteblock(self):
