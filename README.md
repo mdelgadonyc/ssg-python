@@ -1,12 +1,13 @@
 # Static Site Generator (SSG)
 
-A lightweight, easy-to-use static site generator built with Python. This SSG is designed to help developers quickly generate static HTML websites from Markdown files or plain text files.
+A lightweight, easy-to-use static site generator (SSG) built with Python. This SSG is designed to help developers quickly generate static HTML websites from Markdown files.
 
 ## Features
 
-- Convert Markdown files (`.md`) or plain text files (`.txt`) into static HTML.
-- Generate static assets such as CSS and JS files.
-- Lightweight and fast.
+- Converts Markdown files (`.md`) into static HTML pages.
+- Recursively processes all Markdown files in `content`, generating HTML files in the corresponding folder structure within `public`.
+- Copies all static files from the `static` directory to the `public` directory.
+- Lightweight and fast, ideal for small sites.
 
 ## Requirements
 
@@ -21,62 +22,64 @@ A lightweight, easy-to-use static site generator built with Python. This SSG is 
     cd ssg-python
     ```
 
-2. Install dependencies:
-
-    ```bash
-    pip install -r requirements.txt  # For Python
-    ```
-
 ## Usage
 
-1. Prepare your content:
+1. **Prepare your content**:
 
-    Place your `.md` or `.txt` files in the `content` directory. Ensure each file has a title in the front matter for metadata processing.
+    - Place your `.md` files in the `content` directory. Each file should have a title in Markdown header format (`# Title`) at the top for processing.
+    - Store any images, CSS, or other static files in the `static` directory.
 
-2. Build the static site:
-
-    ```bash
-    python ssg.py build  # For Python
-    ```
-
-3. The generated static files will be placed in the `dist` directory.
-
-4. Preview your site:
-
-    You can use any local server to preview the output. For example:
+2. **Build the static site**:
 
     ```bash
-    python -m http.server 8000
+    ./main.sh
     ```
 
-    Open your browser and go to `http://localhost:8000`.
+    - This will generate the static HTML files in the `public` directory. Each `.md` file in `content` will be processed, and the resulting `.html` file will be saved in `public`, mirroring the directory structure of `content`.
 
-## Configuration
+3. **Preview your site**:
 
-You can configure the static site generator using the `config.json` file located in the root directory. This includes options such as:
-
-- **Input directory**: Where your content files are located.
-- **Output directory**: Where the generated HTML files will be saved.
-- **Template**: Path to your HTML templates for consistent site design.
+    - The project serves the generated HTML pages on `localhost` at port `8888` by default. While `main.sh` is running, you can open your browser and navigate to `http://localhost:8888` to preview the site.
 
 ## Example
 
-Here's an example of a Markdown file with front matter:
+This project includes sample files to get you started:
 
-```markdown
----
-title: "Welcome to My Blog"
-description: "This is the first post on my blog."
----
+- **Markdown files**: `index.md` in the root of `content` and another `index.md` in `content/majesty`.
+- **Static assets**: An image (`rivendell.png`) and a CSS file (`index.css`) in `static`.
 
-# Welcome!
+The generated HTML pages will be saved in `public/index.html` and `public/majesty/index.html`, respectively.
 
-This is the first post on my new blog, generated using this awesome Static Site Generator.
-```
+## Directory Structure
+
+After running `./main.sh`, your project structure should look like this:
+
+    ssg-python/
+    ├── content/
+    │   ├── index.md
+    │   └── majesty/
+    │       └── index.md
+    ├── public/
+    │   ├── index.html
+    │   ├── majesty/
+    │   │   └── index.html
+    │   ├── images/
+    │   │   └── rivendell.png
+    │   └── index.css
+    ├── static/
+    │   ├── images/
+    │   │   └── rivendell.png
+    │   └── index.css
+    ├── template.html
+    └── main.sh
+
+## Troubleshooting
+
+- **File Permissions**: Ensure `main.sh` has executable permissions. You may need to run `chmod +x main.sh` before running the script.
 
 ## Contributing
 
-Feel free to contribute to this project by submitting issues or pull requests. Any improvements or features are welcome!
+We welcome contributions! To contribute:
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature-branch`).
